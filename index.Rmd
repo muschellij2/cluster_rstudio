@@ -23,7 +23,7 @@ What this tutorial is not:
 
 ```bash
 ## In local .bashrc file
-export jhpce_username="jmuschel"
+export jhpce_username="YOUR USERNAME"
 alias jhpce="ssh -Y -X ${jhpec_username}@jhpce01.jhsph.edu"
 ```
 
