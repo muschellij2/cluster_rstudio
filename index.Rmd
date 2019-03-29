@@ -81,6 +81,13 @@ plot(0, 0)
 ```
 to see if X11 is forwarded correctly.
 
+## How should this look
+
+```{r, echo = FALSE, out.width = "100%"}
+knitr::include_graphics("example.gif")
+```
+
+## Other Resources/Options
 
 https://www.rdocumentation.org/packages/rmote/versions/0.3.4
 https://cran.r-project.org/package=remoter
