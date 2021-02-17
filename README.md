@@ -24,7 +24,7 @@ I'm going to talk about a bunch of random stuff before talking about how to use 
 
 # Bash Setup 
 
-Stop typing all this stuff.   It's slow, you make mistakes.  Use shortcuts.  Your time is valuable.  Also, if I see you typing this over 2 times when we're working together I'm going to walk away.  It's for both of our sakes.
+Stop typing a bunch of stuff just to start work.   It's slow, you make mistakes.  Use shortcuts.  Your time is valuable.  Also, if I see you typing this over 2 times when we're working together I'm going to walk away.  It's for both of our sake.
 
 ## Setting up your local aliases
 
@@ -118,6 +118,7 @@ function Rbatch {
 }
 ```
 
+## How to use these on the cluster
 How do you use these?  Either a) Make a file in `~/` like `~/Rsubmit.sh` and then run `source ~/Rsubmit.sh` in your `~/.bash_profile` (recommended) or b) copy and paste them in your `~/.bash_profile` (it's your life).  
 Even better, put this in your `~/.bash_profile`:
 ```bash
@@ -127,6 +128,8 @@ fi
 ```
 which checks to see if the file exists before trying to source it all willy-nilly.
 
+
+## How to use these in practice
 There is no big difference between the 2 generally, and I use `Rnosave` almost exclusively. I almost always *name* my jobs, which is an SGE thing.  For example:
 ```bash
 Rnosave script.R -N MYJOB
@@ -143,6 +146,7 @@ Why do I name it in all caps?  It makes it easier to find the output files and t
 Rnosave script.R -l mem_free=20G,h_vmem=21G -t 1-200 -N MYJOB
 ```
 
+## When to use Rbatch
 The times I use `Rbatch` is when I'm using `commandArgs` in the R script and passing in command line arguments to R.  This can complicate things a bit and you need to quote the script, like:
 ```bash
 Rbatch "script.R -a RCOMMANDARG" -l mem_free=20G,h_vmem=21G -t 1-200 -N MYJOB
