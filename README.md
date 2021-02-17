@@ -22,6 +22,11 @@ Go to https://jhpce.jhu.edu/knowledge-base/how-to/ first.
 
 I'm going to talk about a bunch of random stuff before talking about how to use RStudio and JHPCE.
 
+# Terminology
+
+When I say "local" - I mean on your computer.  Like your computer hard drive.  Like the thing you walk around in your back pack.  When I say cluster or server, it's a computer flying high somewhere in the cloud.  I think it's a cumulonimbus cloud, but who knows.  I may say non-local, and that likely means the cloud, it can also be referring to things shipped in, like non-local dairy.
+
+
 # Bash Setup 
 
 Stop typing a bunch of stuff just to start work.   It's slow, you make mistakes.  Use shortcuts.  Your time is valuable.  Also, if I see you typing this over 2 times when we're working together I'm going to walk away.  It's for both of our sake.
