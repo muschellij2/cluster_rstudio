@@ -84,6 +84,22 @@ qrsh
 ```
 and be logged into a compute node.
 
+# Cluster bash setup
+
+## Working directories 
+For the love of whatever you believe in, make aliases or environment variables to working directories.  Also use tab completion.  When typing a path, you should be hitting `tab` as much as you are typing actual letters.
+
+For example if you put this in one of your `bash` things (`rc` or `profile`)
+```bash
+export UKB=/dcl01/smart/data/UKBiobank/Accelerometry/
+```
+then when you log in, you should be able to do something like:
+```bash
+cd $UKB
+```
+to go to that directory.
+
+
 # Submitting R Jobs
 
 There are a number of ways to submit R jobs to the cluster.  One way is to make a `.sh` file and submit that, but that seems like overkill because most times the `sh` file is simply (for a `script.R` file):
