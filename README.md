@@ -35,16 +35,16 @@ Stop typing a bunch of stuff just to start work.   It's slow, you make mistakes.
 
 Set up aliases (kind of functions/short cuts).  When we use `export` in `bash` that's like creating an environment variable, which you have to reference with a `$`.  Aliases are like shortcuts too, but no `$` required.  There are other differences, but do you really care right now?  
 
-Terminal stuff: Your `~/.bash_profile` runs when your user "logs in" to the terminal (when you make a new window).  The `rc` stands for "run commands".  I never knew what that meant until I wrote this thing, so it proves that that info doesn't matter.  But the file itself is *very* important.  It's more important than you think because if you mess it up, no terminal really will run and you'll be very sad face.  So don't mess it up.
+Terminal stuff: Your `~/.bash_profile` runs when your user "logs in" to the terminal (when you make a new window).  The `rc` stands for "run commands".  I never knew what that meant until I wrote this thing, so it proves that that info doesn't matter.  But the file itself is *very* important.  It's more important than you think because if you mess it up, no terminal really will run and you'll be very sad face.  So don't mess it up.  The distinction is `.bash_profile` is read and executed when Bash is invoked as an interactive login shell, while `.bashrc` is executed for an interactive non-login shell (https://linuxize.com/post/bashrc-vs-bash-profile/).
 
-Now that we've scared you enough, put these in `~/.bashrc`.  FYI - `~/` is essentially just a shortcut for "home".  
+Now that we've scared you enough, put these in `~/.bashrc`.  FYI - `~/` is essentially just a shortcut for "home".  If none of these files exist, you can either save one, or run `touch ~/.bashrc` to create an empty file or just run `vi ~/.bashrc` to simply open the file in vim and edit it (type i for INSERT mode).  You can exit using Esc then :(colon) then `wq` for write/save then quit or `q!` for quit without saving.
 
 ```bash
 ## In local .bashrc file
 export jhpce_username="YOUR USERNAME"
-alias jhpce="ssh -Y -X ${jhpec_username}@jhpce01.jhsph.edu"
-alias jhpce2="ssh -Y -X ${jhpec_username}@jhpce02.jhsph.edu"
-alias jhpcet="ssh -Y -X ${jhpec_username}@transfer01.jhpce.jhu.edu"
+alias jhpce="ssh -Y -X ${jhpce_username}@jhpce01.jhsph.edu"
+alias jhpce2="ssh -Y -X ${jhpce_username}@jhpce02.jhsph.edu"
+alias jhpcet="ssh -Y -X ${jhpce_username}@transfer01.jhpce.jhu.edu"
 ```
 
 Make sure you run all the following commands in another new Terminal or run `source ~/.bashrc`.  Source is like `source` in R, it runs stuff.  You can write `source file.sh` or `. file.sh` in most shells.  If it says "command not found", try the other one.
@@ -58,7 +58,7 @@ See https://jhpce.jhu.edu/knowledge-base/authentication/ssh-key-setup/ on how to
 1.  If you've already done this once before you should **NOT** do it again.  This is done locally. Create your public/private keys using `ssh-keygen -t rsa`. Change to your `.ssh` directory with `cd ~/.ssh`. There should be a file `id_rsa.pub` which is your public key file..
 2.  Note, before running this command `IDENTIFIER` should be changed.  Copy your public key to JHPCE, using `scp`:
 
-`cat ~/.ssh/id_rsa.pub | ssh ${jhpec_username}@jhpce01.jhsph.edu 'cat >> ~/.ssh/authorized_keys'`
+`cat ~/.ssh/id_rsa.pub | ssh ${jhpce_username}@jhpce01.jhsph.edu 'cat >> ~/.ssh/authorized_keys'`
 where you can replace `IDENTIFIER` with the name of your computer. 
 
 Now you should be able to run:
@@ -102,7 +102,10 @@ then when you log in, you should be able to do something like:
 ```bash
 cd $UKB
 ```
-to go to that directory.
+to go to that directory. 
+
+NB: When you're working interactively in the shell, and you set an environment variable using the `export` command, its existence ends when your sessions ends.  To make it existent permanently, you should add the `export VAR...` to `~/.bash_profile`.
+
 
 
 # Submitting R Jobs
@@ -139,6 +142,9 @@ function Rbatch {
 }
 ```
 
+Note!! These have a different default than normal `qsub` in that they use `-cwd`,
+which indicates that things should run starting in the current working directory.  If that's not how you work, then remove these arguments and use them as necessary.
+
 ## How to use these on the cluster
 How do you use these?  Either a) Make a file in `~/` like `~/Rsubmit.sh` and then run `source ~/Rsubmit.sh` in your `~/.bash_profile` (recommended) or b) copy and paste them in your `~/.bash_profile` (it's your life).  
 Even better, put this in your `~/.bash_profile`:
@@ -166,6 +172,39 @@ Why do I name it in all caps?  It makes it easier to find the output files and t
 ```bash
 Rnosave script.R -l mem_free=20G,h_vmem=21G -t 1-200 -N MYJOB
 ```
+
+### Where are the logs?  
+
+Again, if you use `Rnosave` as the way I set above, then the code is executed with respect to the current working directory.  So the job logs should be in that directory.  I believe that the job lobs will be in the directory you executed the command, even if the script is in a different directory.   For example, let's say you're in `~/my_work` and you submit `Rnosave ~/my_code/best_code_ever.R -n BEST`, then you will see logs for `BEST` in `~/my_work` and the job will be submitted with `~/my_work` as the starting directory.
+
+## Using RStudio projects and the `here` package
+
+Getting working directories right can be a pain, especially how the data is set up before.  One nice thing of working on the cluster is that you can use *absolute paths* (e.g. `/dcl01/my/project/dir`).  The issue with his is that if you move anything, then everything breaks.  I recommend using the `here` package (https://cran.r-project.org/package=here).  You can use the `here::i_am` to make a file that indicates where the project root is located.  I don't use that functionality, mainly because all my projects are have an RStudio `.Rproj` file that indicates that it is an R project.  The `here` package automatically detects this and has a whole pecking order:
+
+* contains a file `.here`
+* contains a file matching `[.]Rproj$` with contents matching `^Version:  `in the first line
+* contains a file `DESCRIPTION` with contents matching ^Package: 
+* contains a file `remake.yml`
+* contains a file `.projectile`
+* contains a directory `.git`
+* contains a file `.git `with contents matching `^gitdir: `
+* contains a directory `.svn`
+
+The docs say `here` is for interactive use, but I've used it in scripts.  Now, why is this important.  You can specify the full path of a file in `R`:
+
+
+```r
+file.path("/dcl01/my/project/dir", "directory_of_project", "data")
+```
+
+But as long as you are in a project directory, you can simply use:
+
+```r
+here::here("data")
+```
+
+The `here` function works same as `file.path`, so you can simply do `here("data", "sub_data", "mydata.csv")`. 
+
 
 ## When to use Rbatch
 The times I use `Rbatch` is when I'm using `commandArgs` in the R script and passing in command line arguments to R.  This can complicate things a bit and you need to quote the script, like:
@@ -311,10 +350,15 @@ to see if X11 is forwarded correctly.
 
 <img src="example.gif" width="100%" />
 
-## Other Resources/Options
+# Other Resources/Options
 
 https://www.rdocumentation.org/packages/rmote/versions/0.3.4
 https://cran.r-project.org/package=remoter
+
+
+# Acknowledgements
+I'd like to thank [Marta Karas](https://martakarass.github.io/) for feedback on this tutorial.
+
 
 
 
